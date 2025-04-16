@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/yourname/game-works/pkg/proto;proto";
+
+// 客户端请求统一封装
+message ClientMessage {
+  string player_id = 1;
+  string command = 2;
+  bytes payload = 3; // payload 是嵌套的业务请求体
+}
+
+// 匹配请求
+message MatchRequest {
+  string player_id = 1;
+  string game_mode = 2;
+}
