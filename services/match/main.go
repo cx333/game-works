@@ -14,7 +14,7 @@ import (
  */
 
 func main() {
-	logger.Init("match", "debug", "./logs")
+	logger.Init("match", logger.DebugLevel, "./logs")
 	defer logger.Sync()
 	natsx.RegisterTopic(natsx.MatchRequestTopic, "玩家发起匹配请求")
 	natsx.RegisterTopic(natsx.MatchResultTopic, "服务返回匹配成功的结果")

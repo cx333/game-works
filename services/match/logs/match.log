@@ -1,1 +1,3 @@
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2025-04-16T22:19:18.374+0800","caller":"match/main.go:23","msg":"","msg":["匹配服务启动成功"]}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2025-04-16T22:28:59.745+0800","caller":"match/main.go:23","msg":"","module":"match","msg":["匹配服务启动成功"]}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2025-04-16T22:37:18.083+0800","caller":"match/main.go:23","msg":"","module":"match","msg":["匹配服务启动成功"]}
