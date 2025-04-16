@@ -20,7 +20,7 @@ var (
 	atomicLevel zap.AtomicLevel
 )
 
-func Init(serviceName string, level string, logDir string) {
+func Init(serviceName string, level LogLevel, logDir string) {
 	// 日志等级控制器
 	atomicLevel = zap.NewAtomicLevel()
 	_ = atomicLevel.UnmarshalText([]byte(level)) // 设置初始等级
@@ -56,11 +56,6 @@ func Init(serviceName string, level string, logDir string) {
 
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 	log = logger.Sugar().With("module", serviceName)
-}
-
-// SetLevel 动态设置日志等级
-func SetLevel(level string) error {
-	return atomicLevel.UnmarshalText([]byte(level))
 }
 
 // Info 输出日志方法
