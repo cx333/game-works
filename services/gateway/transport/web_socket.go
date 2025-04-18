@@ -2,6 +2,7 @@ package transport
 
 import (
 	"github.com/cx333/game-works/pkg/logger"
+	"github.com/cx333/game-works/services/gateway/router"
 	"github.com/gorilla/websocket"
 	"net/http"
 )
@@ -47,6 +48,7 @@ func handleConnection(conn *websocket.Conn) {
 		}
 		logger.Debug("🫡收到消息：", string(msg))
 		// 调用 router 路由消息
+		router.HandleMessage(conn, msg)
 	}
 }
 

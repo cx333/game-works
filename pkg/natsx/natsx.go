@@ -1,64 +1,77 @@
 package natsx
 
 import (
+	"errors"
 	"fmt"
-	"github.com/nats-io/nats.go"
-	"log"
 	"time"
+
+	"github.com/nats-io/nats.go"
 )
 
-/**
- * @Author: wgl
- * @Description:
- * @File: natsx
- * @Version: 1.0.0
- * @Date: 2025/4/16 20:50
- */
+var (
+	ErrNotConnected = errors.New("natsx: not connected to NATS server")
+	ErrNilHandler   = errors.New("natsx: message handler cannot be nil")
+)
 
-var ErrNotConnected = fmt.Errorf("natsx: connection not initialized")
-
+// NatsConn 封装 NATS 连接
 type NatsConn struct {
-	Conn *nats.Conn
+	conn *nats.Conn
 }
 
-type NatsConnImpl interface {
+// NatsConnInterface 定义 NATS 客户端接口
+type NatsConnInterface interface {
 	Publish(subject string, data []byte) error
-	Subscribe(subject string, handler nats.MsgHandler) error
+	Subscribe(subject string, handler nats.MsgHandler) (*nats.Subscription, error)
 	Close()
+	IsConnected() bool
 }
 
-// New 初始化连接并赋值给 Conn
-func New(natsURL string) (*NatsConn, error) {
-	conn, err := nats.Connect(natsURL,
+// New 创建 NATS 连接
+func New(natsURL string, opts ...nats.Option) (*NatsConn, error) {
+	// 默认配置
+	defaultOpts := []nats.Option{
 		nats.MaxReconnects(10),
-		nats.ReconnectWait(2*time.Second),
+		nats.ReconnectWait(2 * time.Second),
 		nats.Name("game-server"),
-	)
-	if err != nil {
-		log.Fatalf("Failed to connect to NATS: %v", err)
+		nats.Timeout(5 * time.Second),
+		nats.PingInterval(20 * time.Second),
+		nats.MaxPingsOutstanding(3),
 	}
-	log.Println("NATS connected to", natsURL)
-	return &NatsConn{Conn: conn}, nil
+
+	// 合并用户自定义配置
+	finalOpts := append(defaultOpts, opts...)
+
+	conn, err := nats.Connect(natsURL, finalOpts...)
+	if err != nil {
+		return nil, fmt.Errorf("natsx: failed to connect: %w", err)
+	}
+	return &NatsConn{conn: conn}, nil
 }
 
+// Publish 发布消息
 func (c *NatsConn) Publish(subject string, data []byte) error {
-	if c.Conn == nil {
+	if !c.IsConnected() {
 		return ErrNotConnected
 	}
-	return c.Conn.Publish(subject, data)
+	return c.conn.Publish(subject, data)
 }
 
-func (c *NatsConn) Subscribe(subject string, handler nats.MsgHandler) error {
-	if c.Conn == nil {
-		return ErrNotConnected
+// Subscribe 订阅主题
+func (c *NatsConn) Subscribe(subject string, handler nats.MsgHandler) (*nats.Subscription, error) {
+	if !c.IsConnected() {
+		return nil, ErrNotConnected
 	}
-	_, err := c.Conn.Subscribe(subject, handler)
-	if err != nil {
-		log.Println("NATS Subscribe error:", err)
-	}
-	return err
+	return c.conn.Subscribe(subject, handler)
 }
 
+// Close 关闭连接
 func (c *NatsConn) Close() {
-	c.Conn.Close()
+	if c.conn != nil && !c.conn.IsClosed() {
+		c.conn.Close()
+	}
+}
+
+// IsConnected 检查连接状态
+func (c *NatsConn) IsConnected() bool {
+	return c.conn != nil && c.conn.IsConnected()
 }
