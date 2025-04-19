@@ -1,6 +1,6 @@
 package game_data
 
-import "github.com/cx333/game-works/services/game-data/frame"
+import "github.com/cx333/game-works/pkg/frame"
 
 /**
  * @Author: wgl
