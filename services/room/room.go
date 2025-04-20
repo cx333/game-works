@@ -1,7 +1,8 @@
-package main
+package room
 
 import (
 	"github.com/cx333/game-works/pkg/frame"
+	"github.com/cx333/game-works/pkg/model"
 	"sync"
 )
 
@@ -26,25 +27,36 @@ const (
 )
 
 // RoomPlayerNum 房间玩家数量限制——暂定为2
-const RoomPlayerNum = 2
+const RoomPlayerNum = 4
+
+// Fps 暂定帧数为20
+const Fps = 20
 
 // Room 单房间结构体
 type Room struct {
-	mu      sync.Mutex
-	roomId  string
-	players map[string]*Player
-	ticker  frame.FrameLoop
-	state   int8
-	passwd  string
+	// 互斥锁，保证并发安全
+	mu sync.Mutex
+	// 房间唯一ID
+	roomId string
+	// 玩家映射表 [playerId]*Player
+	players map[string]*model.Player
+	// 帧循环控制器
+	ticker *frame.FrameLoop
+	// 房间状态(0:等待中 1:进行中 2:已结束)
+	state int8
+	// 房间密码(可选)
+	passwd string
+	// 当前帧(用于游戏状态同步)
+	frameIndex int64
 }
 
 type RoomImpl interface {
-	editRoomPlayer(player *Player)
+	editRoomPlayer(player *model.Player)
 	deleteRoomPlayer(playerId string)
 }
 
 // editRoomPlayer 编辑房间玩家信息（添加、修改）
-func (r *Room) editRoomPlayer(player *Player) {
+func (r *Room) editRoomPlayer(player *model.Player) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	// 当房间已满，转换状态为 房间准备就绪
@@ -52,7 +64,11 @@ func (r *Room) editRoomPlayer(player *Player) {
 		r.state = Ready
 		return
 	} else {
-		r.players[player.playerId] = player
+		player.Hp = 100
+		player.PosX = 0
+		player.PosY = 0
+		player.Action = model.Idle
+		r.players[player.PlayerId] = player
 	}
 }
 

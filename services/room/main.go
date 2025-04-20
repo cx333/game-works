@@ -1,6 +1,6 @@
-package main
+package room
 
-import "github.com/cx333/game-works/pkg/frame"
+import "github.com/cx333/game-works/pkg/model"
 
 /**
  * @Author: wgl
@@ -11,20 +11,27 @@ import "github.com/cx333/game-works/pkg/frame"
  */
 
 func main() {
-	frameTicker := frame.NewFrameLoop(20)
-	frameTicker.Register(func() {
-
-	})
-	frameTicker.Start()
 	// 创建房间
 	manager := NewRoomManager()
-	room, err := manager.CreateRoom("test-room01")
+	room, err := manager.CreateRoom("test-room01", "")
 	if err != nil {
 		return
 	}
-	room.editRoomPlayer(&Player{
-		playerId: "user1",
-		nickname: "玩家1",
-		avatar:   "😊",
+	// 添加房间玩家
+	room.editRoomPlayer(&model.Player{
+		PlayerId: "user1",
+		Nickname: "玩家1",
+		Avatar:   "😊",
 	})
+	room.editRoomPlayer(&model.Player{
+		PlayerId: "user2",
+		Nickname: "玩家2",
+		Avatar:   "😊",
+	})
+	room.editRoomPlayer(&model.Player{
+		PlayerId: "user3",
+		Nickname: "玩家3",
+		Avatar:   "😊",
+	})
+	select {}
 }

@@ -1,6 +1,9 @@
 package game_data
 
-import "github.com/cx333/game-works/pkg/frame"
+import (
+	"fmt"
+	"github.com/cx333/game-works/pkg/frame"
+)
 
 /**
  * @Author: wgl
@@ -16,6 +19,7 @@ func InitRoom() {
 	loop.Start()
 }
 
-func Update() {
-	// 每一帧要处理的逻辑：同步状态、驱动 AI 等
+func Update(tick uint) {
+	// 每一帧要处理的逻辑：同步状态
+	fmt.Println("当前是第", tick, "帧")
 }

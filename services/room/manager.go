@@ -1,8 +1,9 @@
-package main
+package room
 
 import (
 	"fmt"
 	"github.com/cx333/game-works/pkg/logger"
+	"github.com/cx333/game-works/pkg/model"
 	"sync"
 )
 
@@ -27,7 +28,7 @@ func NewRoomManager() *RoomManager {
 }
 
 // CreateRoom 创建房间（游戏中需要先创建房间再添加数据）
-func (rm *RoomManager) CreateRoom(roomId string) (*Room, error) {
+func (rm *RoomManager) CreateRoom(roomId string, passwd string) (*Room, error) {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
 	if _, exists := rm.rooms[roomId]; exists {
@@ -36,9 +37,13 @@ func (rm *RoomManager) CreateRoom(roomId string) (*Room, error) {
 	}
 	// 创建新房间
 	room := &Room{
-		roomId: roomId,
-		state:  Wait,
+		roomId:     roomId,
+		state:      Wait,
+		players:    make(map[string]*model.Player),
+		passwd:     passwd,
+		frameIndex: 0,
 	}
+	//room.StartFrameLoop()
 	rm.rooms[roomId] = room
 	return room, nil
 }
@@ -61,4 +66,13 @@ func (rm *RoomManager) RemoveRoom(roomId string) {
 	rm.mu.Lock()
 	defer rm.mu.Unlock()
 	delete(rm.rooms, roomId)
+}
+
+// ForEachRoom 遍历房间执行逻辑
+func (rm *RoomManager) ForEachRoom(f func(room *Room)) {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+	for _, room := range rm.rooms {
+		f(room)
+	}
 }
