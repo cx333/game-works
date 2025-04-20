@@ -57,6 +57,6 @@ type Player struct {
 	PosX     int    // 位置x
 	PosY     int    // 位置y
 	Action   string // 动作指令
-	Camp     int    // 阵营
+	CampId   int    // 阵营
 	RoleId   int    // 角色id
 }

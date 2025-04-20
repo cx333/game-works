@@ -26,8 +26,8 @@ const (
 	Ended = 3
 )
 
-// RoomPlayerNum 房间玩家数量限制——暂定为2
-const RoomPlayerNum = 4
+// PlayerNum 房间玩家数量限制——暂定为2
+const PlayerNum = 4
 
 // Fps 暂定帧数为20
 const Fps = 20
@@ -36,18 +36,14 @@ const Fps = 20
 type Room struct {
 	// 互斥锁，保证并发安全
 	mu sync.Mutex
-	// 房间唯一ID
-	roomId string
-	// 玩家映射表 [playerId]*Player
+	// 房间公共结构体
+	rm *model.Room
+	// 玩家映射表 [playerId]*model.Player
 	players map[string]*model.Player
-	// 帧循环控制器
-	ticker *frame.FrameLoop
-	// 房间状态(0:等待中 1:进行中 2:已结束)
-	state int8
-	// 房间密码(可选)
-	passwd string
 	// 当前帧(用于游戏状态同步)
 	frameIndex int64
+	// 帧循环控制器
+	ticker *frame.Loop
 }
 
 type RoomImpl interface {
@@ -60,8 +56,8 @@ func (r *Room) editRoomPlayer(player *model.Player) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	// 当房间已满，转换状态为 房间准备就绪
-	if len(r.players) == RoomPlayerNum {
-		r.state = Ready
+	if len(r.players) == PlayerNum {
+		r.rm.State = Ready
 		return
 	} else {
 		player.Hp = 100

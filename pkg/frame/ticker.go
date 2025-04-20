@@ -13,8 +13,8 @@ import (
  * @Date: 2025/4/19 20:09
  */
 
-// FrameLoop 帧循环调度器结构体
-type FrameLoop struct {
+// Loop FrameLoop 帧循环调度器结构体
+type Loop struct {
 	ticker    *time.Ticker      // 定时触发一帧
 	interval  time.Duration     // 帧之间的间隔时间 用来构造 ticker
 	callbacks []func(tick uint) // 保存每帧需要执行的回调函数 带tick
@@ -24,23 +24,23 @@ type FrameLoop struct {
 }
 
 // NewFrameLoop 创建一个新的调度器，fps 是帧率 （每秒执行几次）
-func NewFrameLoop(fps int) *FrameLoop {
+func NewFrameLoop(fps int) *Loop {
 	interval := time.Second / time.Duration(fps)
-	return &FrameLoop{
+	return &Loop{
 		interval: interval,
 		stopChan: make(chan struct{}),
 	}
 }
 
 // Register 注册一个每帧都会触发的函数
-func (f *FrameLoop) Register(cb func(tick uint)) {
+func (f *Loop) Register(cb func(tick uint)) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.callbacks = append(f.callbacks, cb)
 }
 
 // Start 启动帧循环
-func (f *FrameLoop) Start() {
+func (f *Loop) Start() {
 	f.ticker = time.NewTicker(f.interval)
 	go func() {
 		for {
@@ -55,12 +55,12 @@ func (f *FrameLoop) Start() {
 }
 
 // Stop 停止帧循环
-func (f *FrameLoop) Stop() {
+func (f *Loop) Stop() {
 	close(f.stopChan)
 }
 
 // step 每帧执行所有注册的回调
-func (f *FrameLoop) step() {
+func (f *Loop) step() {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	for _, cb := range f.callbacks {

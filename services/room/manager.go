@@ -37,10 +37,12 @@ func (rm *RoomManager) CreateRoom(roomId string, passwd string) (*Room, error) {
 	}
 	// 创建新房间
 	room := &Room{
-		roomId:     roomId,
-		state:      Wait,
+		rm: &model.Room{
+			RoomId: roomId,
+			State:  Wait,
+			Passwd: passwd,
+		},
 		players:    make(map[string]*model.Player),
-		passwd:     passwd,
 		frameIndex: 0,
 	}
 	//room.StartFrameLoop()
