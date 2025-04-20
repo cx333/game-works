@@ -1,4 +1,4 @@
-package room
+package main
 
 import (
 	"github.com/cx333/game-works/pkg/frame"
@@ -27,7 +27,7 @@ const (
 )
 
 // PlayerNum 房间玩家数量限制——暂定为2
-const PlayerNum = 4
+const PlayerNum = 3
 
 // Fps 暂定帧数为20
 const Fps = 20
@@ -55,16 +55,16 @@ type RoomImpl interface {
 func (r *Room) editRoomPlayer(player *model.Player) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	// 当房间已满，转换状态为 房间准备就绪
-	if len(r.players) == PlayerNum {
-		r.rm.State = Ready
-		return
-	} else {
+	if len(r.players) < PlayerNum+1 {
 		player.Hp = 100
 		player.PosX = 0
 		player.PosY = 0
 		player.Action = model.Idle
 		r.players[player.PlayerId] = player
+	}
+	// 当房间已满，转换状态为 房间准备就绪
+	if len(r.players) == PlayerNum {
+		r.rm.State = Ready
 	}
 }
 

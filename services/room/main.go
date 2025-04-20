@@ -1,6 +1,9 @@
-package room
+package main
 
-import "github.com/cx333/game-works/pkg/model"
+import (
+	"github.com/cx333/game-works/pkg/logger"
+	"github.com/cx333/game-works/pkg/model"
+)
 
 /**
  * @Author: wgl
@@ -11,6 +14,8 @@ import "github.com/cx333/game-works/pkg/model"
  */
 
 func main() {
+	logger.Init("room", logger.DebugLevel, "./logs")
+	defer logger.Sync()
 	// 创建房间
 	manager := NewRoomManager()
 	room, err := manager.CreateRoom("test-room01", "")
@@ -33,5 +38,7 @@ func main() {
 		Nickname: "玩家3",
 		Avatar:   "😊",
 	})
+	room.StartGame()
+
 	select {}
 }

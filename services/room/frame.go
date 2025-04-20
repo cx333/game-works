@@ -1,4 +1,4 @@
-package room
+package main
 
 import (
 	"fmt"
@@ -16,14 +16,14 @@ import (
 
 // StartGame 开始游戏
 func (r *Room) StartGame() {
-	if r.state == Ready {
-		r.state = Running
+	if r.rm.State == Ready {
+		r.rm.State = Running
 		r.StartFrameLoop()
-		log := fmt.Sprintf("房间 %s 开始游戏", r.roomId)
+		log := fmt.Sprintf("房间 %s 开始游戏", r.rm.RoomId)
 		logger.Info(log)
 		return
 	}
-	logger.Warn("房间", r.roomId, "未准备就绪")
+	logger.Warn("房间", r.rm.RoomId, "未准备就绪")
 	return
 }
 
@@ -48,7 +48,7 @@ func (r *Room) UpdateFrame() {
 	defer r.mu.Unlock()
 	// 帧编号递增
 	r.frameIndex++
-	fmt.Printf("Room %s - Frame #%d: 玩家数: %d\n", r.roomId, r.frameIndex, len(r.players))
+	fmt.Printf("Room %s - Frame #%d: 玩家数: %d\n", r.rm.RoomId, r.frameIndex, len(r.players))
 	// 逻辑
 	for _, player := range r.players {
 		fmt.Println("处理玩家", player.PlayerId)
