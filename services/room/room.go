@@ -1,4 +1,4 @@
-package main
+package room
 
 import (
 	"github.com/cx333/game-works/pkg/frame"
@@ -44,6 +44,8 @@ type Room struct {
 	frameIndex int64
 	// 帧循环控制器
 	ticker *frame.Loop
+	// 等待处理的输入
+	pendingInputs []model.PlayerInput
 }
 
 type RoomImpl interface {

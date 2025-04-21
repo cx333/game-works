@@ -1,5 +1,7 @@
 package model
 
+import "github.com/cx333/game-works/pkg/logger"
+
 /**
  * @Author: wgl
  * @Description:
@@ -7,6 +9,7 @@ package model
  * @Version: 1.0.0
  * @Date: 2025/4/20 21:35
  */
+const UnknownPlayer = "Unknown"
 
 // 玩家动作类型常量
 const (
@@ -22,7 +25,7 @@ const (
 	Quit    = "quit"    // 退出房间
 )
 
-var actionToCode = map[string]int{
+var ActionToCode = map[string]int{
 	Idle:    0,  // 闲置
 	Move:    1,  // 移动
 	Attack:  2,  // 攻击
@@ -35,7 +38,7 @@ var actionToCode = map[string]int{
 	Quit:    10, // 退出房间
 }
 
-var codeToAction = map[int]string{
+var CodeToAction = map[int]string{
 	0:  "idle",
 	1:  "move",
 	2:  "attack",
@@ -59,4 +62,30 @@ type Player struct {
 	Action   string // 动作指令
 	CampId   int    // 阵营
 	RoleId   int    // 角色id
+}
+
+// PlayerInput 玩家操作结构体
+type PlayerInput struct {
+	PlayerId string                 // 哪个玩家发起的操作
+	OpType   int                    // 操作类型：move、attack、skill 等
+	Payload  map[string]interface{} // 附加数据，如目标坐标、技能ID等
+	Frame    int64                  // 客户端发送时的帧号（可选，用于同步校验）
+}
+
+// GetActionName 获取动作名称
+func GetActionName(code int) string {
+	if name, ok := CodeToAction[code]; ok {
+		return name
+	}
+	logger.Warn(code, "获取动作名称失败")
+	return UnknownPlayer
+}
+
+// GetActionCode 获取动作代码
+func GetActionCode(name string) int {
+	if code, ok := ActionToCode[name]; ok {
+		return code
+	}
+	logger.Warn(name, "获取动作编码失败")
+	return -1
 }

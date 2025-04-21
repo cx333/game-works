@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	ErrNotConnected = errors.New("natsx: not connected to NATS server")
-	ErrNilHandler   = errors.New("natsx: message handler cannot be nil")
+	ErrNotConnected = errors.New("nats: not connected to NATS server")
+	ErrNilHandler   = errors.New("nats: message handler cannot be nil")
 )
 
 // NatsConn 封装 NATS 连接
@@ -74,4 +74,9 @@ func (c *NatsConn) Close() {
 // IsConnected 检查连接状态
 func (c *NatsConn) IsConnected() bool {
 	return c.conn != nil && c.conn.IsConnected()
+}
+
+// RouterRegister 注册服务
+func (c *NatsConn) RouterRegister(command string, fc func()) {
+
 }

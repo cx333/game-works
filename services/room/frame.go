@@ -1,9 +1,10 @@
-package main
+package room
 
 import (
 	"fmt"
 	"github.com/cx333/game-works/pkg/frame"
 	"github.com/cx333/game-works/pkg/logger"
+	"github.com/cx333/game-works/pkg/model"
 )
 
 /**
@@ -43,14 +44,30 @@ func (r *Room) StopFrameLoop() {
 	}
 }
 
+// AddInput 收集玩家输入，供下一帧处理
+func (r *Room) AddInput(input model.PlayerInput) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.pendingInputs = append(r.pendingInputs, input)
+}
+
+// UpdateFrame 中央处理逻辑+监测作弊
 func (r *Room) UpdateFrame() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	// 帧编号递增
 	r.frameIndex++
-	fmt.Printf("Room %s - Frame #%d: 玩家数: %d\n", r.rm.RoomId, r.frameIndex, len(r.players))
-	// 逻辑
-	for _, player := range r.players {
-		fmt.Println("处理玩家", player.PlayerId)
-	}
+	//for _, input := range r.pendingInputs {
+	//	player, ok := r.players[input.PlayerId]
+	//	if !ok {
+	//		logger.Warn("找不到玩家", input.PlayerId)
+	//		continue
+	//	}
+	//
+	//	switch input.OpType {
+	//	case :
+	//
+	//	}
+	//
+	//}
 }
