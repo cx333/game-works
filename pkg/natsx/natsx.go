@@ -117,7 +117,6 @@ func (c *NatsConn) manageSubscription(subject string, handler nats.MsgHandler) {
 				retryDelay = c.increaseDelay(retryDelay, maxRetryDelay)
 				continue
 			}
-
 			sub, err := c.conn.Subscribe(subject, handler)
 			if err != nil {
 				c.logger.Error("订阅失败",

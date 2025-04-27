@@ -4,6 +4,7 @@ import (
 	"github.com/cx333/game-works/pkg/logger"
 	"github.com/cx333/game-works/pkg/natsx"
 	"github.com/cx333/game-works/services/chat/shared"
+	"github.com/nats-io/nats.go"
 	"time"
 )
 
@@ -19,7 +20,7 @@ func init() {
 	logger.Init("chat", "debug", "./logs/")
 	defer logger.Sync()
 	config := natsx.NatsConfig{
-		URL:            "nats://192.168.1.22:4222",
+		URL:            "nats://192.168.1.63:4222",
 		Name:           "game-server",
 		MaxReconnects:  -1, // 无限重连
 		ReconnectWait:  2 * time.Second,
@@ -34,5 +35,8 @@ func init() {
 }
 
 func main() {
-
+	shared.NatsConn.SubscribeWithRetry(natsx.ChatSendTopic, func(msg *nats.Msg) {
+		println(msg.Subject, string(msg.Data))
+	})
+	select {}
 }

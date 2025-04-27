@@ -7,7 +7,7 @@ option go_package = "github.com/cx333/game-works/pkg/proto/chat";
 message ChatMessage {
   string from = 1;  // 发送者 playerId
   string to = 2; // 接收者 playerId (私聊)
-  string roomId = 3; // 房间ID (房间群聊)
+  string room_id = 3; // 房间ID (房间群聊)
   int32 channel = 4; // 频道类型：world / room / private
   string content = 5; // 聊天内容
   int64 timestamp = 6; // 时间戳，服务器填充
