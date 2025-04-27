@@ -1,4 +1,4 @@
-package main
+package room
 
 import (
 	"github.com/cx333/game-works/pkg/logger"
@@ -14,7 +14,7 @@ import (
  */
 
 func main() {
-	logger.Init("room", logger.DebugLevel, "./logs")
+	logger.Init("room", logger.DebugLevel, "../logs/room")
 	defer logger.Sync()
 	// 创建房间
 	manager := NewRoomManager()

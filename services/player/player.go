@@ -1,6 +1,8 @@
 package main
 
-import "github.com/cx333/game-works/pkg/model"
+import (
+	"github.com/cx333/game-works/pkg/model"
+)
 
 /**
  * @Author: wgl

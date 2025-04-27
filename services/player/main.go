@@ -2,12 +2,18 @@ package main
 
 import (
 	"fmt"
+	"github.com/cx333/game-works/pkg/logger"
 	"github.com/cx333/game-works/pkg/proto" // 确保路径正确
 	"github.com/gorilla/websocket"
 	protouf "google.golang.org/protobuf/proto"
 	"log"
 	"time"
 )
+
+func init() {
+	logger.Init("player", logger.DebugLevel, "../logs/player")
+	defer logger.Sync()
+}
 
 // 创建并发送 ClientMessage
 func createAndSendMessage(ws *websocket.Conn, playerID, command, gameMode string) error {

@@ -1,13 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/cx333/game-works/pkg/logger"
 	"github.com/cx333/game-works/pkg/natsx"
-	"github.com/cx333/game-works/pkg/proto"
-	"github.com/cx333/game-works/services/gateway/router"
+	"github.com/cx333/game-works/services/gateway/shared"
 	"github.com/cx333/game-works/services/gateway/transport"
 	"github.com/nats-io/nats.go"
-	protobuf "google.golang.org/protobuf/proto"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -19,74 +19,46 @@ import (
  * @Date: 2025/4/16 20:31
  */
 
-var NatsConn = natsx.NatsConn{}
-
 func init() {
-	logger.Init("gateway", "debug", "./logs")
+	logger.Init("gateway", "debug", "./logs/")
 	defer logger.Sync()
-	conn, err := natsx.New("nats://192.168.1.22:4222", nil)
+	config := natsx.NatsConfig{
+		URL:            "nats://192.168.1.22:4222",
+		Name:           "game-server",
+		MaxReconnects:  -1, // 无限重连
+		ReconnectWait:  2 * time.Second,
+		ConnectTimeout: 5 * time.Second,
+	}
+	nc, err := natsx.New(config)
 	if err != nil {
-		logger.Error(err.Error())
-	}
-	NatsConn = *conn
-
-	router.Register("gateway", matchRequestHandler)
-	retryDelay := time.Second // 初始重试间隔
-	maxRetryDelay := 30 * time.Second
-	// 监听匹配请求
-	go func() {
-		for {
-			// 检查连接是否有效
-			if conn == nil || !conn.IsConnected() {
-				logger.Error("NATS 连接已断开")
-				time.Sleep(retryDelay)
-				retryDelay = increaseDelay(retryDelay, maxRetryDelay)
-				continue
-			}
-			sub, err := conn.Subscribe(natsx.MatchRequestTopic, onMatchRequest)
-			if err != nil {
-				logger.Error("匹配服务订阅失败:", err)
-				time.Sleep(retryDelay)
-				retryDelay = increaseDelay(retryDelay, maxRetryDelay)
-				continue
-			}
-
-			logger.Info("匹配服务订阅成功，等待消息...")
-
-			// 阻塞直到订阅出错（如连接断开）
-			select {
-			case <-time.After(retryDelay): // 定期检查订阅状态
-				if !sub.IsValid() {
-					logger.Warn("订阅已失效，重新订阅...")
-					break
-				}
-			}
-		}
-	}()
-
-}
-
-// 指数退避计算下一次重试间隔
-func increaseDelay(current, max time.Duration) time.Duration {
-	next := current * 2
-	if next > max {
-		return max
-	}
-	return next
-}
-
-// 消息处理函数
-func onMatchRequest(m *nats.Msg) {
-	var req proto.MatchRequest
-	if err := protobuf.Unmarshal(m.Data, &req); err != nil {
-		logger.Error("反序列化 MatchRequest 失败:", err)
+		logger.Warn("Failed to connect to NATS", err)
 		return
 	}
-
-	logger.Debug("匹配服务处理请求:", req.GameMode, req.PlayerId)
+	shared.NatsConn = nc
 }
 
 func main() {
-	transport.StartWebSocketServer(":9001")
+	go transport.StartTcpServer()
+	logger.Info("程序启动")
 
+	time.Sleep(time.Second * 2)
+
+	err := shared.NatsConn.SubscribeWithRetry("match.request", func(m *nats.Msg) {
+		fmt.Println("收到消息内容:", string(m.Data))
+	})
+	if err != nil {
+		logger.Error("订阅失败", zap.Error(err))
+		return
+	}
+
+	for i := 0; i < 10; i++ {
+		err := shared.NatsConn.Publish("match.request", []byte(fmt.Sprintf("test %d", i)))
+		if err != nil {
+			logger.Error("发布失败", zap.Error(err))
+		}
+		time.Sleep(200 * time.Millisecond) // 稍微慢点
+	}
+
+	// 阻塞主线程
+	select {}
 }

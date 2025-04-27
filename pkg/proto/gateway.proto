@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "github.com/cx333/pkg/proto/gateway.proto";
+
+
+message GatewayMessage {
+  int32 cmd = 1;
+  bytes payload = 2;
+}
+
