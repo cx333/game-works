@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/cx333/game-works/pkg/logger"
 	"github.com/cx333/game-works/pkg/natsx"
+	"github.com/cx333/game-works/services/chat/message"
 	"github.com/cx333/game-works/services/chat/shared"
-	"github.com/nats-io/nats.go"
 	"time"
 )
 
@@ -35,8 +35,6 @@ func init() {
 }
 
 func main() {
-	shared.NatsConn.SubscribeWithRetry(natsx.ChatSendTopic, func(msg *nats.Msg) {
-		println(msg.Subject, string(msg.Data))
-	})
+	message.SubMessage()
 	select {}
 }

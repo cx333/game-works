@@ -23,8 +23,10 @@ const (
 	MatchResultTopic  = "match.result"  // 匹配成功后返回匹配结果
 
 	// ========= 聊天服务 =========
-	ChatSendTopic      = "chat.send"      // 客户端发送聊天消息
-	ChatBroadcastTopic = "chat.broadcast" // 服务端广播聊天消息
+	ChatSendTopic    = "chat.send"    // 客户端发送聊天消息
+	ChatPrivateTopic = "chat.private" // 服务端返回私聊消息
+	ChatRoomTopic    = "chat.room"    // 服务端返回房间消息
+	ChatPublicTopic  = "chat.public"  // 服务端广播聊天消息
 
 	// ========= 房间服务 =========
 	RoomCreateTopic = "room.create" // 创建房间
@@ -51,7 +53,7 @@ const (
 )
 
 var TopicDescriptions = map[string]string{
-	MatchRequestTopic:  "玩家请求匹配",
-	ChatBroadcastTopic: "聊天广播消息",
+	MatchRequestTopic: "玩家请求匹配",
+	ChatPublicTopic:   "聊天广播消息",
 	// ...
 }

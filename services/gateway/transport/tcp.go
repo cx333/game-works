@@ -10,6 +10,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"net"
 	"os"
+	"sync"
 )
 
 /**
@@ -19,6 +20,8 @@ import (
  * @Version: 1.0.0
  * @Date: 2025/4/16 20:35
  */
+
+var TcpConnMap = sync.Map{}
 
 func StartTcpServer() {
 	ln, err := net.Listen("tcp", shared.TcpPort)

@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+log:
+  level: debug
+  path: ./logs
+
+database:
+  pgsql:
+    host: 192.168.1.63
+    port: 5432
+    user: wgl
+    password: 123456
+    dbname: game-admin
+    sslmode: disable
+  redis:
+    addr: 127.0.0.1:6379
+    password: ""
+    db: 0
+  mongo:
+    uri: mongodb://localhost:27017
+    dbname: admin_mongo
+
+jwt:
+  secret: your_jwt_secret
+  expires: 3600

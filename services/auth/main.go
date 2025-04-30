@@ -13,14 +13,19 @@ func main() {
 	if err != nil {
 		log.Fatalf("连接网关失败: %v", err)
 	}
-	defer conn.Close()
+	defer func(conn net.Conn) {
+		err := conn.Close()
+		if err != nil {
+			return
+		}
+	}(conn)
 
 	// 构造要发送的业务消息（比如聊天）
 	chatMsg := &protocol.ChatMessage{
-		From:      "player123",
-		To:        "", // 私聊频道
-		RoomId:    "", // 房间频道
-		Channel:   1,  // 频道类型：1 世界频道
+		From:      "user01",
+		To:        "user02", // 私聊频道
+		RoomId:    "room01", // 房间频道
+		Channel:   1,        // 频道类型：1 世界频道
 		Content:   "你好，世界！",
 		Timestamp: 0, // 让服务器来填
 	}
@@ -33,7 +38,7 @@ func main() {
 
 	// 再构造 GatewayMessage（带 cmd）
 	msg := &protocol.GatewayMessage{
-		Cmd:     2001, // 假设 1001 是聊天
+		Cmd:     2001, // 假设 2001 是聊天
 		Payload: payload,
 	}
 

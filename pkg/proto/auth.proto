@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/cx333/game-works/pkg/proto/auth";
+
+// 登录类型
+enum LoginType {
+  UNKNOWN = 0;
+  ACCOUNT = 1;  // 用户名 + 密码
+  TOKEN   = 2;  // 已登录用户发起 token 登录
+  GUEST   = 3;  // 游客登录
+}
+
+// 客户端认证请求
+message AuthMessage {
+  LoginType type = 1;
+  string user_id = 2;     // 用户 ID 或用户名
+  string token = 3;       // 登录 token（或密码，根据 type 决定）
+  string device_id = 4;   // 设备 ID，可选
+  string platform = 5;    // iOS / Android / PC，便于统计
+  string version = 6;     // 客户端版本号
+}
+
+// 认证结果响应
+message AuthResult {
+  bool success = 1;
+  string message = 2;     // 失败原因（如 "token过期"）
+  string user_id = 3;     // 成功后确认下发 user_id（统一）
+}
+
+// 注册请求
+message RegisterMessage {
+  string user_id = 1;     // 用户名
+  string password = 2;    // 密码
+  string email = 3;       // 可选
+  string device_id = 4;
+  string platform = 5;
+  string version = 6;
+}
+
+// 注册响应
+message RegisterResult {
+  bool success = 1;
+  string message = 2;     // 错误原因
+  string user_id = 3;     // 注册成功的 ID
+}
