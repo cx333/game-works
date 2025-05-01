@@ -3,19 +3,16 @@ package sysModel
 import "time"
 
 type SysUser struct {
-	ID        uint64    `gorm:"primaryKey" json:"id"`
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
 	Username  string    `gorm:"uniqueIndex;size:64;not null" json:"username"`
 	Password  string    `gorm:"size:128;not null" json:"-"`
-	Nickname  string    `gorm:"size:64" json:"nickname"`
-	Email     string    `gorm:"size:128" json:"email"`
-	Phone     string    `gorm:"size:32" json:"phone"`
-	Status    int       `gorm:"default:1" json:"status"` // 0禁用, 1正常
-	DeptID    uint      `json:"dept_id"`                 // 所属部门
-	PostID    uint      `json:"post_id"`                 // 岗位
-	Avatar    string    `json:"avatar"`
-	Remark    string    `json:"remark"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	RealName  string    `gorm:"size:64;not null" json:"realName"`
+	Avatar    string    `gorm:"size:256" json:"avatar"`
+	HomePath  string    `gorm:"size:128" json:"homePath"`
+	Desc      string    `gorm:"size:256" json:"desc"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	Roles     []SysRole `gorm:"many2many:user_roles;" json:"roles"`
 }
 
 func (u *SysUser) TableName() string {
@@ -23,7 +20,6 @@ func (u *SysUser) TableName() string {
 }
 
 type Auth struct {
-	ID       uint   `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }

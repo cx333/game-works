@@ -5,72 +5,79 @@ import (
 	"net/http"
 )
 
-type Resource struct {
-	Code int         `json:"code"` // 业务码，200成功，其他失败
-	Data interface{} `json:"data"` // 数据部分，可为对象、列表、分页等
-	Msg  string      `json:"msg"`  // 提示信息
+type Response struct {
+	Code    int         `json:"code"`    // 业务码，0表示成功
+	Type    string      `json:"type"`    // 类型：success 或 error
+	Message string      `json:"message"` // 消息提示
+	Result  interface{} `json:"result"`  // 返回数据
 }
 
 // Success 成功：带数据
 func Success(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusOK, Resource{
-		Code: 200,
-		Data: data,
-		Msg:  "success",
+	ctx.JSON(http.StatusOK, Response{
+		Code:    0,
+		Type:    "success",
+		Message: "操作成功",
+		Result:  data,
 	})
 }
 
-// SuccessMsg 成功：自定义消息
+// SuccessMsg 成功：带自定义消息
 func SuccessMsg(ctx *gin.Context, msg string) {
-	ctx.JSON(http.StatusOK, Resource{
-		Code: 200,
-		Data: nil,
-		Msg:  msg,
+	ctx.JSON(http.StatusOK, Response{
+		Code:    0,
+		Type:    "success",
+		Message: msg,
+		Result:  nil,
 	})
 }
 
-// ErrBind 绑定数据错误
+// ErrBind 失败：请求绑定错误
 func ErrBind(ctx *gin.Context) {
-	ctx.JSON(http.StatusBadRequest, Resource{
-		Code: 400,
-		Data: nil,
-		Msg:  "failed",
+	ctx.JSON(http.StatusBadRequest, Response{
+		Code:    1,
+		Type:    "error",
+		Message: "参数绑定失败",
+		Result:  nil,
 	})
 }
 
-// Error 错误：默认错误
+// Error 默认错误
 func Error(ctx *gin.Context) {
-	ctx.JSON(http.StatusInternalServerError, Resource{
-		Code: 500,
-		Data: nil,
-		Msg:  "error",
+	ctx.JSON(http.StatusInternalServerError, Response{
+		Code:    1,
+		Type:    "error",
+		Message: "服务器内部错误",
+		Result:  nil,
 	})
 }
 
-// ErrorMsg 错误：自定义消息
+// ErrorMsg 自定义错误消息
 func ErrorMsg(ctx *gin.Context, msg string) {
-	ctx.JSON(http.StatusInternalServerError, Resource{
-		Code: 500,
-		Data: nil,
-		Msg:  msg,
+	ctx.JSON(http.StatusInternalServerError, Response{
+		Code:    1,
+		Type:    "error",
+		Message: msg,
+		Result:  nil,
 	})
 }
 
-// ErrorCode 错误：自定义错误码和消息
+// ErrorCode 自定义业务码和消息
 func ErrorCode(ctx *gin.Context, code int, msg string) {
-	ctx.JSON(http.StatusOK, Resource{
-		Code: code,
-		Data: nil,
-		Msg:  msg,
+	ctx.JSON(http.StatusOK, Response{
+		Code:    code,
+		Type:    "error",
+		Message: msg,
+		Result:  nil,
 	})
 }
 
-// Fail 快捷：失败
+// Fail 快捷失败
 func Fail(ctx *gin.Context, msg string) {
 	ErrorMsg(ctx, msg)
 }
 
-// PageData 分页结构体
+// PageData 分页数据结构体
 type PageData struct {
 	List  interface{} `json:"list"`
 	Total int64       `json:"total"`
@@ -80,14 +87,15 @@ type PageData struct {
 
 // Page 分页响应
 func Page(ctx *gin.Context, list interface{}, total int64, page, limit int) {
-	ctx.JSON(http.StatusOK, Resource{
-		Code: 200,
-		Data: PageData{
+	ctx.JSON(http.StatusOK, Response{
+		Code:    0,
+		Type:    "success",
+		Message: "操作成功",
+		Result: PageData{
 			List:  list,
 			Total: total,
 			Page:  page,
 			Limit: limit,
 		},
-		Msg: "success",
 	})
 }

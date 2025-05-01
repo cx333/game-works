@@ -3,14 +3,14 @@ package sysModel
 import "time"
 
 type SysRole struct {
-	ID        uint64    `gorm:"primaryKey" json:"id"`
-	Name      string    `gorm:"size:64;not null" json:"name"`
-	Code      string    `gorm:"size:64;uniqueIndex;not null" json:"code"` // 如 admin, user
-	Status    int       `gorm:"default:1" json:"status"`
-	DataScope string    `gorm:"size:64;default:'ALL'" json:"data_scope"`
-	Remark    string    `json:"remark"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name      string    `gorm:"uniqueIndex;size:64;not null" json:"name"`
+	Label     string    `gorm:"size:64;not null" json:"label"`
+	Desc      string    `gorm:"size:256" json:"desc"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	Users     []SysUser `gorm:"many2many:user_roles;" json:"users"`
+	Codes     []SysCode `gorm:"many2many:role_codes;" json:"codes"`
 }
 
 func (r *SysRole) TableName() string {

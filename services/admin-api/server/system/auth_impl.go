@@ -24,8 +24,21 @@ type AuthImpl interface {
 type AuthSvr struct{}
 
 func (a AuthSvr) LoginImpl(req *sysModel.Auth) (token string, err error) {
+	var user sysModel.SysUser
+	err = model.PgsqlDB.Model(&sysModel.SysUser{}).Where("username = ?", req.Username).First(&user).Error
+	if err != nil || user.Username != req.Username {
+		return "", err
+	}
+	// 2. 比对密码（核心逻辑）
+	err = bcrypt.CompareHashAndPassword(
+		[]byte(user.Password), // 数据库存储的哈希密码
+		[]byte(req.Password),  // 用户输入的明文密码
+	)
+	if err != nil {
+		return "", err
+	}
 	// 实现登录逻辑
-	generateToken, err := middleware.GenerateToken(req.ID, req.Username)
+	generateToken, err := middleware.GenerateToken(uint(user.ID), req.Username)
 	if err != nil {
 		return "", err
 	}

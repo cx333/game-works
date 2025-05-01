@@ -30,7 +30,7 @@ func LoginHandler(ctx *gin.Context) {
 		resource.ErrorMsg(ctx, "登录失败，用户名或密码错误")
 		return
 	}
-	resource.Success(ctx, gin.H{"token": token})
+	resource.Success(ctx, gin.H{"accessToken": token})
 }
 
 // LogoutHandler 退出登录
@@ -54,4 +54,12 @@ func RegisterHandler(ctx *gin.Context) {
 		return
 	}
 	resource.SuccessMsg(ctx, "注册成功")
+}
+
+// 刷新Token
+func RefreshToken(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"data":   "new-mock-token",
+		"status": 0,
+	})
 }

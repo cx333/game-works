@@ -35,3 +35,9 @@ func RegisterRoutes(r *gin.Engine) {
 
 	// 其他模块...
 }
+
+func RegisterSystemRoutes(api *gin.RouterGroup) {
+	RegisterAuthRoutes(api)
+	RegisterUserRoutes(api.Group("/user"))
+	RegisterMenuRoutes(api.Group("/menu"))
+}
