@@ -67,11 +67,9 @@ func (a AuthSvr) RegisterImpl(req *sysModel.AuthRegister) bool {
 		Nickname: req.Nickname,
 		Email:    req.Email,
 		Phone:    req.Phone,
-		Status:   1,
-		DeptID:   req.DeptId,
-		PostID:   req.PostId,
+		Status:   0,
 		Avatar:   req.Avatar,
-		Remark:   req.Remark,
+		Desc:     req.Desc,
 	}
 	if err := model.PgsqlDB.Create(&newUser).Error; err != nil {
 		return false

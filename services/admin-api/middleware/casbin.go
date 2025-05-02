@@ -15,13 +15,23 @@ import (
  * @Date: 2025/4/30 19:59
  */
 
-func SetupCasbin() *casbin.Enforcer {
-	a, _ := gormadapter.NewAdapterByDB(model.PgsqlDB)
-	e, _ := casbin.NewEnforcer("config/casbin_model.conf", a)
-	err := e.LoadPolicy()
+func SetupCasbin() (*casbin.Enforcer, error) {
+	a, err := gormadapter.NewAdapterByDB(model.PgsqlDB)
 	if err != nil {
-		logger.Error("LoadPolicy err", err.Error())
-		return nil
+		logger.Error("Failed to create Casbin adapter:", err)
+		return nil, err
 	}
-	return e
+
+	e, err := casbin.NewEnforcer("config/casbin.conf", a)
+	if err != nil {
+		logger.Error("Failed to create Casbin enforcer:", err)
+		return nil, err
+	}
+
+	if err := e.LoadPolicy(); err != nil {
+		logger.Error("Failed to load Casbin policy:", err)
+		return nil, err
+	}
+
+	return e, nil
 }

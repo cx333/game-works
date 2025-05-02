@@ -14,10 +14,19 @@ import (
  */
 
 func RegisterSystemRoutes(group *gin.RouterGroup) {
-	sys := group.Group("/sys")
+	auth := group.Group("/auth")
 	{
-		sys.POST("/login", system.LoginHandler)
-		sys.POST("/logout", system.LogoutHandler)
-		sys.POST("/register", system.RegisterHandler)
+		auth.POST("/logout", system.LogoutHandler)
+		auth.POST("/register", system.RegisterHandler)
+		auth.GET("/codes", system.GetAccessCodes)
+		auth.POST("/refresh", system.RefreshToken)
+	}
+	user := group.Group("/user")
+	{
+		user.GET("/info", system.GetUserInfo)
+	}
+	menu := group.Group("/menu")
+	{
+		menu.GET("/tree", system.GetAllMenus)
 	}
 }
