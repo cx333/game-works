@@ -1,9 +1,9 @@
-package system
+package Permissions
 
 import (
-	"github.com/cx333/game-works/services/admin-api/model/sysModel"
+	modelAuth "github.com/cx333/game-works/services/admin-api/model/organize"
 	"github.com/cx333/game-works/services/admin-api/resource"
-	"github.com/cx333/game-works/services/admin-api/server/system"
+	"github.com/cx333/game-works/services/admin-api/server/Permissions"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -11,16 +11,16 @@ import (
 /**
  * @Author: wgl
  * @Description: 登陆
- * @File: auth.go
+ * @File: system.go
  * @Version: 1.0.0
  * @Date: 2025/4/30 21:43
  */
 
-var sysAuth system.AuthSvr
+var sysAuth Permissions.AuthSvr
 
 // LoginHandler 用户登录
 func LoginHandler(ctx *gin.Context) {
-	var req sysModel.Auth
+	var req modelAuth.Auth
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		resource.ErrBind(ctx)
 		return
@@ -42,7 +42,7 @@ func LogoutHandler(ctx *gin.Context) {
 
 // RegisterHandler 用户注册
 func RegisterHandler(ctx *gin.Context) {
-	var req sysModel.AuthRegister
+	var req modelAuth.AuthRegister
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		resource.ErrBind(ctx)
 		return

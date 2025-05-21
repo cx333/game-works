@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/cx333/game-works/pkg/logger"
 	"github.com/cx333/game-works/pkg/natsx"
-	"github.com/cx333/game-works/services/gateway/shared"
+	"github.com/cx333/game-works/pkg/shared"
 	"github.com/cx333/game-works/services/gateway/transport"
 	"time"
 )
@@ -31,7 +31,7 @@ func init() {
 		logger.Warn("Failed to connect to NATS", err)
 		return
 	}
-	shared.NatsConn = nc
+	shared.GatewayNats = nc
 }
 
 func main() {

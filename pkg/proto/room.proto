@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "github.com/cx333/game-works/pkg/proto/proto";
+
+message RoomMessage {
+  uint32 type = 1; // 行为 1:创建房间 2:添加玩家
+  // 创建房间
+  string room_id = 2; // 房间ID 创建房间，取userid
+  string password = 3; // 房间密码 可为空
+  // 添加玩家
+  string player_id = 4; // 玩家id 取userid
+}

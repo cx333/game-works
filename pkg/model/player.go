@@ -1,6 +1,9 @@
 package model
 
-import "github.com/cx333/game-works/pkg/logger"
+import (
+	"github.com/cx333/game-works/pkg/logger"
+	"strconv"
+)
 
 /**
  * @Author: wgl
@@ -77,7 +80,7 @@ func GetActionName(code int) string {
 	if name, ok := CodeToAction[code]; ok {
 		return name
 	}
-	logger.Warn(code, "获取动作名称失败")
+	logger.Warn(strconv.Itoa(code), "获取动作名称失败")
 	return UnknownPlayer
 }
 

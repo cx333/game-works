@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/cx333/game-works/services/admin-api/controller/system"
+	"github.com/cx333/game-works/services/admin-api/controller/Permissions"
 	"github.com/cx333/game-works/services/admin-api/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -18,7 +18,7 @@ import (
 func RegisterRoutes(r *gin.Engine) {
 	// 全局中间件（如 CORS、日志等）
 	r.Use(middleware.CORSMiddleware())
-	r.POST("/api/auth/login", system.LoginHandler)
+	r.POST("/api/auth/login", Permissions.LoginHandler)
 	r.Use(middleware.JWTAuthMiddleware())
 
 	// API 分组（可按版本号扩展）

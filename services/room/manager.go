@@ -1,4 +1,4 @@
-package room
+package main
 
 import (
 	"fmt"
@@ -57,7 +57,7 @@ func (rm *RoomManager) GetRoom(roomId string) (*Room, error) {
 	room, exists := rm.rooms[roomId]
 	if !exists {
 		log := fmt.Errorf("房间不存在")
-		logger.Warn(log)
+		logger.Warn("房间不存在")
 		return room, log
 	}
 	return room, nil

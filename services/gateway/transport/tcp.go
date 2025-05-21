@@ -6,11 +6,13 @@ import (
 	"github.com/cx333/game-works/pkg/logger"
 	"github.com/cx333/game-works/pkg/natsx"
 	protocol "github.com/cx333/game-works/pkg/proto"
-	"github.com/cx333/game-works/services/gateway/shared"
+	"github.com/cx333/game-works/pkg/shared"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"net"
 	"os"
 	"sync"
+	"time"
 )
 
 /**
@@ -88,11 +90,18 @@ func handleConnectionTcp(conn net.Conn) {
 				logger.Warn("No route found for cmd:", msg.Cmd)
 				return
 			}
-
-			// 将 Payload 发布到 NATS
-			err := shared.NatsConn.Publish(serviceSubject, msg.Payload)
+			// 将 Payload 发布到 NATS 并等待回应
+			request, err := shared.GatewayNats.Request(serviceSubject, msg.Payload, 2*time.Second)
 			if err != nil {
 				logger.Warn("TCP server publish error:", err)
+				return
+			}
+
+			// 定义消息回调
+			response := protocol.Response{}
+			err = proto.Unmarshal(request.Data, &response)
+			if err != nil {
+				logger.Error("unmarshal chat message error", zap.Error(err))
 				return
 			}
 
@@ -110,5 +119,13 @@ func routeByCmd(cmd int32) string {
 		return natsx.ChatSendTopic
 	default:
 		return "unknown"
+	}
+}
+
+// 发送消息
+func sendMsg(conn net.Conn, msg []byte) {
+	_, err := conn.Write(msg)
+	if err != nil {
+		return
 	}
 }

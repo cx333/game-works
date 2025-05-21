@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/cx333/game-works/pkg/logger"
 	"github.com/cx333/game-works/pkg/natsx"
+	"github.com/cx333/game-works/pkg/shared"
+	"time"
 )
 
 /**
@@ -18,11 +20,19 @@ var NatsConn = natsx.NatsConn{}
 func init() {
 	logger.Init("match", logger.DebugLevel, "./logs")
 	defer logger.Sync()
-	conn, err := natsx.New("nats://192.168.1.22:4222")
-	if err != nil {
-		logger.Error(err.Error())
+	config := natsx.NatsConfig{
+		URL:            "nats://192.168.1.63:4222",
+		Name:           "game-server",
+		MaxReconnects:  -1, // 无限重连
+		ReconnectWait:  2 * time.Second,
+		ConnectTimeout: 5 * time.Second,
 	}
-	NatsConn = *conn
+	nc, err := natsx.New(config)
+	if err != nil {
+		logger.Warn("Failed to connect to NATS", err)
+		return
+	}
+	shared.MatchNats = nc
 
 }
 

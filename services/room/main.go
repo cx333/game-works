@@ -1,8 +1,15 @@
-package room
+package main
 
 import (
 	"github.com/cx333/game-works/pkg/logger"
 	"github.com/cx333/game-works/pkg/model"
+	"github.com/cx333/game-works/pkg/natsx"
+	protocol "github.com/cx333/game-works/pkg/proto"
+	"github.com/cx333/game-works/pkg/shared"
+	"github.com/nats-io/nats.go"
+	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
+	"time"
 )
 
 /**
@@ -13,32 +20,60 @@ import (
  * @Date: 2025/4/19 20:11
  */
 
-func main() {
+func init() {
 	logger.Init("room", logger.DebugLevel, "../logs/room")
 	defer logger.Sync()
-	// 创建房间
-	manager := NewRoomManager()
-	room, err := manager.CreateRoom("test-room01", "")
+	config := natsx.NatsConfig{
+		URL:            "nats://192.168.1.63:4222",
+		Name:           "game-server",
+		MaxReconnects:  -1, // 无限重连
+		ReconnectWait:  2 * time.Second,
+		ConnectTimeout: 5 * time.Second,
+	}
+	nc, err := natsx.New(config)
+	if err != nil {
+		logger.Warn("Failed to connect to NATS", err)
+		return
+	}
+	shared.RoomNats = nc
+}
+
+func main() {
+	err := shared.RoomNats.SubscribeWithRetry(natsx.RoomCreateTopic, func(msg *nats.Msg) {
+		var roomMsg protocol.RoomMessage
+		if err := proto.Unmarshal(msg.Data, &roomMsg); err != nil {
+			logger.Error("unmarshal chat message error", zap.Error(err))
+			return
+		}
+
+		switch roomMsg.Type {
+		case shared.NewRoom:
+			manager := NewRoomManager()
+			room, err := manager.CreateRoom(roomMsg.RoomId, roomMsg.Password)
+			if err != nil {
+				return
+			}
+			shared.AllRoom.Store(roomMsg.RoomId, room)
+			room.editRoomPlayer(&model.Player{
+				PlayerId: roomMsg.PlayerId,
+			})
+		case shared.PushPlayer:
+			if val, _ := shared.AllRoom.Load(roomMsg.RoomId); val != nil {
+				room := val.(*Room)
+				room.editRoomPlayer(&model.Player{
+					PlayerId: roomMsg.PlayerId,
+				})
+			}
+		case shared.ExitRoom:
+			if val, _ := shared.AllRoom.Load(roomMsg.RoomId); val != nil {
+				room := val.(*Room)
+				room.deleteRoomPlayer(roomMsg.PlayerId)
+			}
+		default:
+			return
+		}
+	})
 	if err != nil {
 		return
 	}
-	// 添加房间玩家
-	room.editRoomPlayer(&model.Player{
-		PlayerId: "user1",
-		Nickname: "玩家1",
-		Avatar:   "😊",
-	})
-	room.editRoomPlayer(&model.Player{
-		PlayerId: "user2",
-		Nickname: "玩家2",
-		Avatar:   "😊",
-	})
-	room.editRoomPlayer(&model.Player{
-		PlayerId: "user3",
-		Nickname: "玩家3",
-		Avatar:   "😊",
-	})
-	room.StartGame()
-
-	select {}
 }

@@ -1,4 +1,4 @@
-PROTO_DIR := ./pkg/proto
+PROTO_DIR := ./
 PROTO_FILES := $(wildcard $(PROTO_DIR)/*.proto)
 GO_OUT := .
 

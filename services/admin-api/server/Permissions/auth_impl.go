@@ -1,9 +1,9 @@
-package system
+package Permissions
 
 import (
 	"github.com/cx333/game-works/services/admin-api/middleware"
 	"github.com/cx333/game-works/services/admin-api/model"
-	"github.com/cx333/game-works/services/admin-api/model/sysModel"
+	"github.com/cx333/game-works/services/admin-api/model/organize"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -16,16 +16,16 @@ import (
  */
 
 type AuthImpl interface {
-	LoginImpl(req *sysModel.Auth) (token string, err error)
-	LogoutImpl(req *sysModel.Auth) bool
-	RegisterImpl(req *sysModel.AuthRegister) bool
+	LoginImpl(req *organize.Auth) (token string, err error)
+	LogoutImpl(req *organize.Auth) bool
+	RegisterImpl(req *organize.AuthRegister) bool
 }
 
 type AuthSvr struct{}
 
-func (a AuthSvr) LoginImpl(req *sysModel.Auth) (token string, err error) {
-	var user sysModel.SysUser
-	err = model.PgsqlDB.Model(&sysModel.SysUser{}).Where("username = ?", req.Username).First(&user).Error
+func (a AuthSvr) LoginImpl(req *organize.Auth) (token string, err error) {
+	var user organize.User
+	err = model.PgsqlDB.Model(&organize.User{}).Where("username = ?", req.Username).First(&user).Error
 	if err != nil || user.Username != req.Username {
 		return "", err
 	}
@@ -45,13 +45,13 @@ func (a AuthSvr) LoginImpl(req *sysModel.Auth) (token string, err error) {
 	return generateToken, err
 }
 
-func (a AuthSvr) LogoutImpl(req *sysModel.Auth) bool {
+func (a AuthSvr) LogoutImpl(req *organize.Auth) bool {
 	return true
 }
 
-func (a AuthSvr) RegisterImpl(req *sysModel.AuthRegister) bool {
+func (a AuthSvr) RegisterImpl(req *organize.AuthRegister) bool {
 	var count int64
-	err := model.PgsqlDB.Model(&sysModel.SysUser{}).Where("username = ?", req.Username).Count(&count).Error
+	err := model.PgsqlDB.Model(&organize.User{}).Where("username = ?", req.Username).Count(&count).Error
 	if err != nil || count > 0 {
 		return false
 	}
@@ -61,7 +61,7 @@ func (a AuthSvr) RegisterImpl(req *sysModel.AuthRegister) bool {
 		return false
 	}
 
-	newUser := sysModel.SysUser{
+	newUser := organize.User{
 		Username: req.Username,
 		Password: string(hashedPwd),
 		Nickname: req.Nickname,

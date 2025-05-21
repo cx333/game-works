@@ -1,13 +1,13 @@
-package system
+package organize
 
 import (
 	"github.com/cx333/game-works/services/admin-api/resource"
-	"github.com/cx333/game-works/services/admin-api/server/system"
+	"github.com/cx333/game-works/services/admin-api/server/organize"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-var sysUser = system.UserSvr{}
+var sysUser = organize.UserSvr{}
 
 // GetUserInfo 获取用户信息
 func GetUserInfo(ctx *gin.Context) {

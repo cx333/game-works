@@ -1,6 +1,6 @@
-package sysModel
+package Permissions
 
-type CasbinRule struct {
+type PermCasbinRule struct {
 	ID    uint   `gorm:"primaryKey"`
 	PType string `gorm:"size:100"`
 	V0    string `gorm:"size:100"`
@@ -11,4 +11,4 @@ type CasbinRule struct {
 	V5    string `gorm:"size:100"`
 }
 
-func (CasbinRule) TableName() string { return "casbin_rule" }
+func (*PermCasbinRule) TableName() string { return "perm_casbin_rule" }

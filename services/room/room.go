@@ -1,4 +1,4 @@
-package room
+package main
 
 import (
 	"github.com/cx333/game-works/pkg/frame"

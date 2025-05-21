@@ -2,8 +2,9 @@ package router
 
 import (
 	"github.com/cx333/game-works/pkg/natsx"
-	"github.com/cx333/game-works/services/gateway/shared"
+	"github.com/cx333/game-works/pkg/shared"
 	"github.com/nats-io/nats.go"
+	"net"
 )
 
 /**
@@ -15,22 +16,32 @@ import (
  */
 
 func HandleAllMessage() {
-	err := shared.NatsConn.SubscribeWithRetry("chat.>", handleChatMessage)
+	err := shared.GatewayNats.SubscribeWithRetry("chat.>", handleChatMessage)
 	if err != nil {
 		return
 	}
 }
+
+var PublicChan chan map[net.Conn][]byte
 
 func handleChatMessage(msg *nats.Msg) {
 	switch msg.Subject {
 	case "chat.send":
 		return
 	case natsx.ChatPrivateTopic:
-	// 私聊
-	case natsx.ChatRoomTopic:
-	// 房间
-	case natsx.ChatPublicTopic:
-		// 广播
 
+	case natsx.ChatRoomTopic:
+
+	case natsx.ChatPublicTopic:
+		//go func() {
+		//	transport.TcpConnMap.Range(func(key, value any) bool {
+		//		if conn := value.(net.Conn); conn != nil {
+		//			pubMap := make(map[net.Conn][]byte, 1)
+		//			pubMap[conn] = msg.Data
+		//			PublicChan <- pubMap
+		//		}
+		//		return true
+		//	})
+		//}()
 	}
 }
