@@ -22,7 +22,7 @@ func HandleAllMessage() {
 	}
 }
 
-var PublicChan chan map[net.Conn][]byte
+var PublicChan chan map[net.Conn][]byte = make(chan map[net.Conn][]byte, 100)
 
 func handleChatMessage(msg *nats.Msg) {
 	switch msg.Subject {
@@ -32,6 +32,9 @@ func handleChatMessage(msg *nats.Msg) {
 
 	case natsx.ChatRoomTopic:
 
+	// TODO: The following broadcast logic for ChatPublicTopic is incomplete.
+	// It requires a consumer goroutine for PublicChan to process and send messages to clients.
+	// The message framing (e.g., length-prefixing) also needs to be implemented for these broadcasts.
 	case natsx.ChatPublicTopic:
 		//go func() {
 		//	transport.TcpConnMap.Range(func(key, value any) bool {
